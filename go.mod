@@ -1,4 +1,4 @@
-module github.com/histweety-labs/shared
+module github.com/instr-labs/shared
 
 go 1.24.4
 
