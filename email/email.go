@@ -1,12 +1,13 @@
 package email
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/smtp"
 
 	initx "github.com/instrlabs/shared/init"
 )
+
+var sendMail = smtp.SendMail
 
 func SendEmail(emailTo, subject, body string) error {
 	from := initx.GetEnv("EMAIL_FROM", "")
@@ -36,63 +37,8 @@ func SendEmail(emailTo, subject, body string) error {
 	addr := host + ":" + port
 	auth := smtp.PlainAuth("", username, password, host)
 
-	var client *smtp.Client
-	if port == "465" {
-		// Implicit TLS
-		conn, err := tls.Dial("tcp", addr, &tls.Config{ServerName: host})
-		if err != nil {
-			return fmt.Errorf("tls dial failed: %w", err)
-		}
-		defer conn.Close()
-
-		c, err := smtp.NewClient(conn, host)
-		if err != nil {
-			return fmt.Errorf("smtp new client failed: %w", err)
-		}
-		client = c
-	} else {
-		// Plain connect then STARTTLS if available
-		c, err := smtp.Dial(addr)
-		if err != nil {
-			return fmt.Errorf("smtp dial failed: %w", err)
-		}
-		client = c
-		// Upgrade to TLS if server supports it
-		if ok, _ := client.Extension("STARTTLS"); ok {
-			if err := client.StartTLS(&tls.Config{ServerName: host}); err != nil {
-				_ = client.Close()
-				return fmt.Errorf("starttls failed: %w", err)
-			}
-		}
+	if err := sendMail(addr, auth, from, []string{emailTo}, []byte(msg)); err != nil {
+		return fmt.Errorf("sendmail failed: %w", err)
 	}
-	defer client.Quit()
-
-	// Authenticate if supported
-	if ok, _ := client.Extension("AUTH"); ok {
-		if err := client.Auth(auth); err != nil {
-			_ = client.Close()
-			return fmt.Errorf("smtp auth failed: %w", err)
-		}
-	}
-
-	if err := client.Mail(from); err != nil {
-		_ = client.Close()
-		return fmt.Errorf("MAIL FROM failed: %w", err)
-	}
-	if err := client.Rcpt(emailTo); err != nil {
-		_ = client.Close()
-		return fmt.Errorf("RCPT TO failed: %w", err)
-	}
-	wc, err := client.Data()
-	if err != nil {
-		_ = client.Close()
-		return fmt.Errorf("DATA failed: %w", err)
-	}
-	if _, err := wc.Write([]byte(msg)); err != nil {
-		_ = wc.Close()
-		_ = client.Close()
-		return fmt.Errorf("write message failed: %w", err)
-	}
-	_ = wc.Close()
 	return nil
 }
