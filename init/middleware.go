@@ -9,8 +9,8 @@ import (
 
 func SetupLogger(app *fiber.App) {
 	app.Use(logger.New(logger.Config{
-		Format:     "[${time}] ${status} | ${latency} | ${ip} | ${method} ${path}${query} | ${locals:UserID}\n",
-		TimeFormat: "2006-01-02 15:04:05",
+		Format:     "{\"ts\":\"${time}\",\"status\":${status},\"latency\":\"${latency}\",\"ip\":\"${ip}\",\"method\":\"${method}\",\"path\":\"${path}\",\"query\":\"${query}\",\"user_id\":\"${locals:UserID}\",\"referer\":\"${referer}\",\"user_agent\":\"${ua}\n",
+		TimeFormat: "2006-01-02T15:04:05.000Z07:00",
 		TimeZone:   "UTC",
 	}))
 }
