@@ -1,7 +1,9 @@
 package initx
 
 import (
+	"os"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -9,9 +11,10 @@ import (
 
 func SetupLogger(app *fiber.App) {
 	app.Use(logger.New(logger.Config{
-		Format:     "{\"ts\":\"${time}\",\"service_name\":\"${header:X-Service-Name}\",\"status\":\"${status}\",\"latency\":\"${latency}\",\"method\":\"${method}\",\"path\":\"${path}\",\"user_id\":\"${header:X-User-Id}\",\"user_agent\":\"${ua}\",\"ip\":\"${header:X-User-Ip}\"}",
-		TimeFormat: "2006-01-02T15:04:05.000Z07:00",
+		Format:     `{"time":"${time}","host":"${header:X-Forwarded-Host}","ip":"${header:X-Forwarded-For}","method":"${method}","path":"${path}","status":${status},"latency":"${latency}","userAgent":"${header:X-User-Agent}"}` + "\n",
+		TimeFormat: time.RFC3339Nano,
 		TimeZone:   "UTC",
+		Output:     os.Stdout,
 	}))
 }
 
