@@ -62,3 +62,12 @@ func (s *S3) Get(objectName string) []byte {
 	}
 	return b
 }
+
+func (s *S3) Delete(objectName string) error {
+	err := s.Client.RemoveObject(context.Background(), s.Cfg.S3Bucket, objectName, minio.RemoveObjectOptions{})
+	if err != nil {
+		log.Errorf("Failed to delete object %s from S3: %v", objectName, err)
+		return err
+	}
+	return nil
+}
