@@ -22,11 +22,11 @@ func SendEmail(emailTo, subject, body string) error {
 
 	// Build minimal MIME message headers
 	headers := map[string]string{
-		"From":         from,
-		"To":           emailTo,
-		"Subject":      subject,
-		"MIME-Version": "1.0",
-		"Content-Type": "text/plain; charset=\"UTF-8\"",
+		"from":         from,
+		"to":           emailTo,
+		"subject":      subject,
+		"mime-version": "1.0",
+		"content-type": "text/plain; charset=\"UTF-8\"",
 	}
 	var msg string
 	for k, v := range headers {

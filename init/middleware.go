@@ -11,7 +11,7 @@ import (
 
 func SetupLogger(app *fiber.App) {
 	app.Use(logger.New(logger.Config{
-		Format:     `{"time":"${time}","host":"${header:X-Forwarded-Host}","ip":"${header:X-Forwarded-For}","method":"${method}","path":"${path}","status":${status},"latency":"${latency}","userAgent":"${header:X-User-Agent}"}` + "\n",
+		Format:     `{"time":"${time}","host":"${header:x-user-host}","ip":"${header:x-user-ip}","method":"${method}","path":"${path}","status":${status},"latency":"${latency}","userAgent":"${header:x-user-agent}"}` + "\n",
 		TimeFormat: time.RFC3339Nano,
 		TimeZone:   "UTC",
 		Output:     os.Stdout,
@@ -29,12 +29,12 @@ func SetupAuthenticated(app *fiber.App, whitelist []string) {
 			return false
 		}
 
-		isAuthenticated := c.Get("X-Authenticated") == "true"
+		isAuthenticated := c.Get("x-authenticated") == "true"
 		if isAuthenticated {
-			userId := c.Get("X-User-Id")
-			c.Locals("UserID", userId)
-			roles := c.Get("X-User-Roles")
-			c.Locals("Roles", roles)
+			userId := c.Get("x-user-id")
+			roles := c.Get("x-user-roles")
+			c.Locals("userId", userId)
+			c.Locals("userRoles", roles)
 		}
 
 		if !isPublic(c.Path()) && !isAuthenticated {
