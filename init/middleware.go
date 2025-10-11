@@ -5,6 +5,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -47,4 +48,11 @@ func SetupAuthenticated(app *fiber.App, whitelist []string) {
 
 		return c.Next()
 	})
+}
+
+func SetupPrometheus(app *fiber.App) {
+	appName := GetEnv("APP_NAME", "-")
+	prom := fiberprometheus.New(appName)
+	prom.RegisterAt(app, "/metrics")
+	app.Use(prom.Middleware)
 }
