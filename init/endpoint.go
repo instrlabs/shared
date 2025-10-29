@@ -13,6 +13,7 @@ import (
 // SetupServiceSwagger sets up the Swagger endpoint with dynamic server URL
 // gatewayURL is the base URL of the gateway service (e.g., "http://localhost:3000")
 // servicePath is the service path (e.g., "/auth" or "/images")
+// Note: Errors are logged internally and do not need to be handled by the caller
 func SetupServiceSwagger(app *fiber.App, gatewayURL, servicePath string) {
 	// Read the static swagger.json file
 	swaggerPath := filepath.Join("static", "swagger.json")
