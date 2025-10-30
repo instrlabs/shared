@@ -30,13 +30,12 @@ func SetupAuthenticated(app *fiber.App, whitelist []string) {
 			return false
 		}
 
-		isAuthenticated := c.Get("x-authenticated") == "true"
-		if isAuthenticated {
-			userId := c.Get("x-user-id")
+		userId := c.Get("x-user-id")
+		if userId != "" {
 			c.Locals("userId", userId)
 		}
 
-		if !isPublic(c.Path()) && !isAuthenticated {
+		if !isPublic(c.Path()) && userId == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": "Unauthorized",
 				"errors":  nil,
