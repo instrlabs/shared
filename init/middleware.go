@@ -33,9 +33,7 @@ func SetupAuthenticated(app *fiber.App, whitelist []string) {
 		isAuthenticated := c.Get("x-authenticated") == "true"
 		if isAuthenticated {
 			userId := c.Get("x-user-id")
-			roles := c.Get("x-user-roles")
 			c.Locals("userId", userId)
-			c.Locals("userRoles", roles)
 		}
 
 		if !isPublic(c.Path()) && !isAuthenticated {
