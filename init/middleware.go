@@ -35,6 +35,17 @@ func SetupAuthenticated(app *fiber.App, whitelist []string) {
 			c.Locals("userId", userId)
 		}
 
+		// Extract and set device info from headers for session binding
+		ipAddress := c.Get("x-user-ip")
+		if ipAddress != "" {
+			c.Locals("userIP", ipAddress)
+		}
+
+		userAgent := c.Get("x-user-agent")
+		if userAgent != "" {
+			c.Locals("userAgent", userAgent)
+		}
+
 		if !isPublic(c.Path()) && userId == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"message": "Unauthorized",
